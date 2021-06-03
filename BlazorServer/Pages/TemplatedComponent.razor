@@ -1,0 +1,36 @@
+﻿@page "/templated-component"
+@using BlazorServer.Components
+
+<h3>TemplatedComponent</h3>
+<a href="https://docs.microsoft.com/en-us/aspnet/core/blazor/components/templated-components?view=aspnetcore-5.0" target="_blank">Documentation on Templated Componentes</a>
+<BlockGroup>
+    <Content>
+        <p>Content can be any valid HTML</p>
+    </Content>
+</BlockGroup>
+
+<BlockGroup Title="Text title">
+    <Content>
+        <p>Content can be any valid HTML</p>
+    </Content>
+</BlockGroup>
+
+<BlockGroup Title="Text title">
+    <Content>
+        <p>Content can be any blazore component</p>
+        <Clock/>
+    </Content>
+</BlockGroup>
+
+<BlockGroup Title="Text title">
+    <Content>
+        <p>Content can be any valid HTML</p>
+    </Content>
+    <Footer>
+        <p>Footer can be any valid HTML</p>
+    </Footer>
+</BlockGroup>
+
+@code {
+
+}

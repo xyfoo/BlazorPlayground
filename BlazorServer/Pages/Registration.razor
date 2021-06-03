@@ -1,0 +1,110 @@
+﻿@using BlazorServer.Data
+
+
+@page "/registration"
+@inject ShowAvailabilityService showAvailabilityService
+@inject IJSRuntime JS
+
+
+<h3>Registration</h3>
+<p>@UserName - @UserPhone </p>
+
+
+
+<div class="block-group">
+    <h2>Details</h2>
+    <label class="reg-label" for="username">Name</label>
+    <input class="reg-input" id="username" @bind-value="UserName" @bind-value:event="oninput" type="text" placeholder="Name" />
+    <label class="reg-label" for="userphone">Phone</label>
+    <input class="reg-input" id="userphone" @bind-value="UserPhone" @bind-value:event="oninput" type="tel" placeholder="Phone" />
+
+    @if (SelectedSlot != null)
+    {
+        <p>Selected slot: @SelectedSlot.Venue.Name - @(SelectedSlot.DateTime.ToString("yyyy MMM dd"))</p>
+    }
+</div>
+
+@if (CanShowVenue)
+{
+    <button @onclick="RefreshAvailability">Show Available Location</button>
+}
+
+<div class="block-group">
+    @if (AvailableVenues != null)
+    {
+        <hr />
+        @if (AvailableVenues.Count() == 0)
+        {
+            <p>There are no more available slots</p>
+        }
+        else
+        {
+            @foreach (Venue v in AvailableVenues)
+            {
+                <details>
+                    <summary>
+                        @v.Name
+                    </summary>
+                    <div style="display:flex; flex-wrap:wrap">
+                        @foreach (ShowAvailability sa in GetAvailabilityByVenue(v))
+                        {
+                            @*<button id="@sa.Id" style="background-color: greenyellow; margin: 0.5rem;" @onclick="@(e => RegisterSlot(e, sa))">
+                                    @sa.DateTime.ToString("MMM dd")
+                                </button>*@
+                            <button id="@sa.Id" style="background-color: @(SelectedSlot != null && SelectedSlot.Id == sa.Id ? "greenyellow" : "hotpink"); margin: 0.5rem;" @onclick="@(e => SelectSlot(e, sa))">
+                                @sa.DateTime.ToString("MMM dd")
+                            </button>
+                        }
+                    </div>
+                </details>
+            }
+        }
+
+    }
+</div>
+
+
+
+
+
+
+
+
+
+@code {
+
+    string UserName { get; set; }
+    string UserPhone { get; set; }
+    bool CanShowVenue => string.IsNullOrWhiteSpace(UserName) == false && string.IsNullOrWhiteSpace(UserPhone) == false;
+    ShowAvailability SelectedSlot;
+
+    Venue[] AvailableVenues { get; set; }
+
+    private Task RefreshAvailability()
+    {
+        AvailableVenues = showAvailabilityService.GetAvailability().Where(x => x.IsAvailable).Select(x => x.Venue).Distinct().ToArray();
+        return Task.CompletedTask;
+    }
+
+    private ShowAvailability[] GetAvailabilityByVenue(Venue venue)
+    {
+        return showAvailabilityService.GetAvailability().Where(x => x.Venue.Id == venue.Id && x.IsAvailable).ToArray();
+    }
+
+    private async Task RegisterSlot(MouseEventArgs e, ShowAvailability sa)
+    {
+        bool isSuccessful = showAvailabilityService.Book(sa, new Attendee() { Name = UserName, Phone = UserName });
+        if (isSuccessful == false)
+        {
+            await JS.InvokeVoidAsync("alert", "The slot has been taken!");
+        }
+        RefreshAvailability();
+    }
+
+    private async Task SelectSlot(MouseEventArgs e, ShowAvailability sa)
+    {
+        SelectedSlot = sa;
+    }
+
+
+}

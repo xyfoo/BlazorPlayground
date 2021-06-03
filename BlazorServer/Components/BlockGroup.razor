@@ -1,0 +1,24 @@
+﻿@inherits LayoutComponentBase
+
+<div class="block-group">
+    @if (string.IsNullOrWhiteSpace(Title) == false)
+    {
+        <h1>@Title</h1>
+        <hr />
+    }
+    @Content
+    @if (Footer != null)
+    {
+        <hr />
+        @Footer
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public RenderFragment Content { get; set; }
+    [Parameter]
+    public RenderFragment Footer { get; set; }
+}

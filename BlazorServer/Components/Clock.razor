@@ -1,0 +1,41 @@
+﻿@using System.Timers;
+@implements IDisposable
+
+<div>
+    <h4>Clock</h4>
+    <p>@($"{CurDateTime:s}Z")</p>
+    <button style="display: inline;" @onclick="StartStopButtonOnClicked">@(timer != null && timer.Enabled ? "Stop" : "Start")</button>
+    <p>Notes: This component will generate constant traffic in Blazor Server, as it always need to have a round trip to get the lastest data</p>
+</div>
+
+
+@code {
+    DateTime CurDateTime;
+    Timer timer;
+
+    protected override void OnInitialized()
+    {
+        CurDateTime = DateTime.MinValue;
+        timer = new Timer(1000);
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
+        timer.Enabled = true;
+    }
+
+    private void StartStopButtonOnClicked(MouseEventArgs evt)
+    {
+        timer.Enabled = !timer.Enabled;
+    }
+
+    private void OnTimedEvent(Object source, ElapsedEventArgs e)
+    {
+        CurDateTime = DateTime.Now;
+        // https://stackoverflow.com/questions/64797090/c-sharp-blazor-countdown-timer
+        InvokeAsync(StateHasChanged);
+    }
+
+    void IDisposable.Dispose()
+    {
+        timer?.Dispose();
+    }
+}
