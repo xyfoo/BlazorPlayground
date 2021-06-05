@@ -1,0 +1,263 @@
+﻿<div class="fib">
+    <h2>Departures</h2>
+    <div class="fib-table">
+        <table class="table table-borderless">
+            <thead>
+                <tr>
+                    <th style="vertical-align: top;">Time</th>
+                    <th>Flight<input class="table-search" @bind-value="TableSearchFlight" @bind-value:event="oninput"></th>
+                    <th>Origin<input class="table-search" @bind-value="TableSearchOrigin" @bind-value:event="oninput"></th>
+                    <th>Destination<input class="table-search" @bind-value="TableSearchDestination" @bind-value:event="oninput"></th>
+                    <th>Gate<input class="table-search" @bind-value="TableSearchGate" @bind-value:event="oninput"></th>
+                    <th>Status<input class="table-search" @bind-value="TableSearchStatus" @bind-value:event="oninput"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (FilteredFlights != null && FilteredFlights.Count > 0)
+                {
+                    <Virtualize Items="@FilteredFlights" Context="flight">
+                        <tr @key="@flight.Id">
+                            <td>@flight.DepartureTime.ToString("MMM dd, HH:mm")</td>
+                            <td>@flight.FlightNumber</td>
+                            <td>@flight.Origin</td>
+                            <td>@flight.Destination</td>
+                            <td>@flight.Gate</td>
+                            <td class="@GetStatusCssClass(flight.Status)">@flight.Status</td>
+                        </tr>
+                    </Virtualize>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6">
+                            <p>Please refine your search criteria</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div>Search returns @FilteredFlights.Count() records in @(TableSearchElapsedTime.TotalMilliseconds)ms</div>
+</div>
+
+@code {
+
+
+    class FlightInfo
+    {
+        public int Id { get; set; }
+        public string FlightNumber { get; set; }
+        public string Origin { get; set; }
+        public string Destination { get; set; }
+        public string Gate { get; set; }
+        public DateTime DepartureTime { get; set; }
+        public string Status { get; set; }
+    }
+
+    private List<string> places = new List<string> {
+        "Tokyo",
+        "Delhi",
+        "Shanghai",
+        "São Paulo",
+        "Mexico City",
+        "Cairo",
+        "Mumbai",
+        "Beijing",
+        "Dhaka",
+        "Osaka",
+        "New York City",
+        "Karachi",
+        "Buenos Aires",
+        "Chongqing",
+        "Istanbul",
+        "Kolkata",
+        "Manila",
+        "Lagos",
+        "Rio de Janeiro",
+        "Tianjin",
+        "Kinshasa",
+        "Guangzhou",
+        "Los Angeles",
+        "Moscow",
+        "Shenzhen",
+        "Lahore",
+        "Bangalore",
+        "Paris",
+        "Bogotá",
+        "Jakarta",
+        "Chennai",
+        "Lima",
+        "Bangkok",
+        "Seoul",
+        "Nagoya",
+        "Hyderabad",
+        "London",
+        "Tehran",
+        "Chicago",
+        "Chengdu",
+        "Nanjing",
+        "Wuhan",
+        "Ho Chi Minh City",
+        "Luanda",
+        "Ahmedabad",
+        "Kuala Lumpur",
+        "Xi'an",
+        "Hong Kong",
+        "Dongguan",
+        "Hangzhou",
+        "Foshan",
+        "Shenyang",
+        "Riyadh",
+        "Baghdad",
+        "Santiago",
+        "Surat",
+        "Madrid",
+        "Suzhou",
+        "Pune",
+        "Harbin",
+        "Houston",
+        "Dallas",
+        "Toronto",
+        "Dar es Salaam",
+        "Miami",
+        "Belo Horizonte",
+        "Singapore",
+        "Philadelphia",
+        "Atlanta",
+        "Fukuoka",
+        "Khartoum",
+        "Barcelona",
+        "Johannesburg",
+        "Saint Petersburg",
+        "Qingdao",
+        "Dalian",
+        "Washington, D.C.",
+        "Yangon",
+        "Alexandria",
+        "Jinan",
+        "Guadalajara"
+    };
+
+    private List<string> statuses = new List<string>
+{
+        null,
+        "Boarding",
+        "Gate Open",
+        "Last Call",
+        "Gate Closing",
+        "Gate Closed",
+        "New Gate",
+        "Cancelled",
+    };
+
+    private List<string> airlineCodes = new List<string>
+{
+        "DL",
+        "AA",
+        "UA",
+        "LH",
+        "AF",
+        "KL",
+        "WN",
+        "BA",
+        "IB",
+        "CZ",
+        "NH",
+        "MU",
+        "MH",
+        "AK",
+        "CI",
+        "FY",
+        "SQ",
+        "MI",
+        "TR",
+        "VA",
+        "NZ",
+        "FR",
+        "CA",
+        "EK"
+    };
+
+    private T GetRandom<T>(IEnumerable<T> enumerable, int randomSeed)
+    {
+        Random rnd = new Random(DateTime.Now.Millisecond * (enumerable.Count() + randomSeed));
+        return enumerable.ElementAt(rnd.Next(enumerable.Count() - 1));
+    }
+
+    private string GetStatusCssClass(string status)
+    {
+        if (string.Compare(status, "Gate Open", true) == 0)
+        {
+            return "gateopen";
+        }
+        else if (string.Compare(status, "Boarding", true) == 0)
+        {
+            return "boarding";
+        }
+        else if (string.Compare(status, "Last Call", true) == 0)
+        {
+            return "lastcall";
+        }
+        else if (string.Compare(status, "Gate Closing", true) == 0)
+        {
+            return "gateclosing";
+        }
+
+        return null;
+    }
+    private string TableSearchFlight;
+    private string TableSearchDestination;
+    private string TableSearchOrigin;
+    private string TableSearchGate;
+    private string TableSearchStatus;
+    private TimeSpan TableSearchElapsedTime;
+
+    private List<FlightInfo> AllFlights = new List<FlightInfo>();
+    private List<FlightInfo> FilteredFlights
+    {
+        get
+        {
+            DateTime start = DateTime.Now;
+
+            IEnumerable<FlightInfo> result = AllFlights;
+            if (String.IsNullOrWhiteSpace(TableSearchFlight) == false)
+            {
+                result = result.Where(x => x.FlightNumber.Contains(TableSearchFlight.Trim()));
+            }
+            if (String.IsNullOrWhiteSpace(TableSearchOrigin) == false)
+            {
+                result = result.Where(x => x.Origin.Contains(TableSearchOrigin.Trim()));
+            }
+            if (string.IsNullOrWhiteSpace(TableSearchDestination) == false)
+            {
+                result = result.Where(x => x.Destination.Contains(TableSearchDestination.Trim()));
+            }
+            if (string.IsNullOrWhiteSpace(TableSearchGate) == false)
+            {
+                result = result.Where(x => x.Gate.Contains(TableSearchGate.Trim()));
+            }
+            if (string.IsNullOrWhiteSpace(TableSearchStatus) == false)
+            {
+                result = result.Where(x => x.Status.Contains(TableSearchStatus.Trim()));
+            }
+
+            DateTime end = DateTime.Now;
+            TableSearchElapsedTime = end - start;
+            return result.OrderBy(x => x.DepartureTime).ToList();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        AllFlights = Enumerable.Range(1, 50000).Select(x => new FlightInfo
+        {
+            Id = x,
+            FlightNumber = $"{GetRandom(airlineCodes, x)}{(x % 1000) + 1:0000}",
+            Origin = GetRandom(places, x),
+            Destination = GetRandom(places, x + 1),
+            Gate = $"G{GetRandom(Enumerable.Range(1,60), x)}",
+            DepartureTime = DateTime.Now.AddMinutes(x % 360),
+            Status = GetRandom(statuses, x)
+        }).ToList();
+    }
+}

@@ -1,0 +1,46 @@
+﻿.fib {
+    font-family: monospace;
+}
+
+.fib-table {
+    height: 50vh;
+    overflow-y: scroll;
+    background-color: black;
+}
+
+.table-search {
+    display:block;
+}
+
+table {
+    color: gold;
+    background-color: black;
+    font-size: 1.5rem;
+}
+
+thead > tr {
+    position: sticky;
+    top: 0px;
+    background-color: black;
+    border-bottom: 1px solid white;
+}
+
+.gateopen {
+    background-color: blue;
+    color: white;
+}
+
+.boarding {
+    background-color: green;
+    color: white;
+}
+
+.lastcall {
+    background-color: darkorange;
+    color: white;
+}
+
+.gateclosing {
+    background-color: darkred;
+    color: white;
+}
