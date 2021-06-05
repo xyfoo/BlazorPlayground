@@ -2,6 +2,8 @@
 @using BlazorServer.Components
 
 <h3>Virtualization</h3>
-<p>We have a flight infomation display system component with 50K records loaded. This component is written using Blazor virtualization, so only visible + overscanned item is rendered in the DOM.</p>
+<p>We have a flight infomation display system component with 50K records loaded. This component is written using Blazor virtualization, so only limited (visible + overscanned) items are rendered in the DOM.</p>
+
+<p>If we run <code style="background-color: black; color: white; padding: 0.25em 0.5em;">document.getElementsByTagName("tbody")[0].childElementCount</code> it should return around ~20-100 records</p>
 <hr/>
 <FlightInfoBoard/>
