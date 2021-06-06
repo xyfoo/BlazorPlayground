@@ -1,0 +1,9 @@
+﻿.nav-link {
+    cursor: pointer;
+}
+
+.nav-link.active, .nav-link.active:hover {
+    background: #1e1e1e;
+    border-bottom: none;
+    color: white;
+}

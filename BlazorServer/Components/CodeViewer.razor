@@ -1,0 +1,41 @@
+﻿@using System.Reflection
+@using System.Web
+@inject IJSRuntime JS
+
+<div class="code-viewer">
+    @if (OutputFileContent != null)
+    {
+        <pre>
+            <code>@OutputFileContent</code>
+        </pre>
+    }
+    else
+    {
+        <p style="color: darkred">Failed to load @SourceFilePath</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string SourceFilePath { get; set; }
+    public string OutputFileName { get; set; } = null;
+    public string OutputFileContent { get; set; } = null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var dllPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        var filePath = System.IO.Path.Combine(new string[] { dllPath, SourceFilePath });
+        if (System.IO.File.Exists(filePath))
+        {
+            OutputFileContent = await System.IO.File.ReadAllTextAsync(filePath);
+            OutputFileName = System.IO.Path.GetFileName(filePath);
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // Calling windows.highlightCodes() thru JSInterop
+        // JS function defined in _Host.cshtml
+        JS.InvokeVoidAsync("highlightCodes");
+    }
+}

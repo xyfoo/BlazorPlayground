@@ -1,0 +1,37 @@
+﻿@using BlazorServer.Components
+
+@page "/jsinterop"
+
+<h3>JSInteropPage</h3>
+
+<p>We display 2 source file for this page thru a custom Blazor component, CodeViewer</p>
+<p>When the tab is pressed, it will load the source code, and call highlight.js to perform sytax highlighting</p>
+
+<ul class="nav nav-tabs">
+    @for (int x = 0; x < SourceFile.Count(); x++)
+    {
+        // https://docs.microsoft.com/en-us/aspnet/core/blazor/components/?view=aspnetcore-5.0#capture-references-to-components
+        // If we use `x` value in the onclick lambda, we will always get `2`, cos that's the last value of `x`
+        // To capture the value in moment, we save it to another variable, and use it in the onclick event
+        var fileIndex = x;
+        <li class="nav-item" @key=fileIndex>
+            <a class="nav-link @(fileIndex == CurrentFileIndex ? "active": null)" @onclick="@(() => SwitchTabContent(fileIndex))">@SourceFile[fileIndex]</a>
+        </li>
+    }
+</ul>
+<div style="border: 1px solid rgb(222, 226, 230)">
+    <!-- When we call highlight.js to highlight the code, it will add new classed to the CodeViewer DOM, and will break the DOM tracking (I think) -->
+    <!-- Using the @@key to ensure the CodeViewer component will be regenerated when we change the file index -->
+    <!-- https://docs.microsoft.com/en-us/aspnet/core/blazor/components/?view=aspnetcore-5.0#use-key-to-control-the-preservation-of-elements-and-components -->
+    <CodeViewer @key=CurrentFileIndex SourceFilePath="@SourceFile[CurrentFileIndex]"></CodeViewer>
+</div>
+
+@code {
+    private string[] SourceFile = new string[] { @"Pages\JSInteropPage.razor", @"Components\CodeViewer.razor", @"Pages\_Host.cshtml" };
+    public int CurrentFileIndex = 0;
+
+    private void SwitchTabContent(int i)
+    {
+        CurrentFileIndex = i;
+    }
+}

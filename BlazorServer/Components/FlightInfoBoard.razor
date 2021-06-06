@@ -222,23 +222,23 @@
             IEnumerable<FlightInfo> result = AllFlights;
             if (String.IsNullOrWhiteSpace(TableSearchFlight) == false)
             {
-                result = result.Where(x => x.FlightNumber.Contains(TableSearchFlight.Trim()));
+                result = result.Where(x => x.FlightNumber.ToLower().Contains(TableSearchFlight.Trim().ToLower()));
             }
             if (String.IsNullOrWhiteSpace(TableSearchOrigin) == false)
             {
-                result = result.Where(x => x.Origin.Contains(TableSearchOrigin.Trim()));
+                result = result.Where(x => x.Origin.ToLower().Contains(TableSearchOrigin.Trim().ToLower()));
             }
             if (string.IsNullOrWhiteSpace(TableSearchDestination) == false)
             {
-                result = result.Where(x => x.Destination.Contains(TableSearchDestination.Trim()));
+                result = result.Where(x => x.Destination.ToLower().Contains(TableSearchDestination.Trim().ToLower()));
             }
             if (string.IsNullOrWhiteSpace(TableSearchGate) == false)
             {
-                result = result.Where(x => x.Gate.Contains(TableSearchGate.Trim()));
+                result = result.Where(x => x.Gate.ToLower().Contains(TableSearchGate.Trim().ToLower()));
             }
             if (string.IsNullOrWhiteSpace(TableSearchStatus) == false)
             {
-                result = result.Where(x => x.Status.Contains(TableSearchStatus.Trim()));
+                result = result.Where(x => string.IsNullOrWhiteSpace(x.Status) == false && x.Status.ToLower().Contains(TableSearchStatus.Trim().ToLower()));
             }
 
             DateTime end = DateTime.Now;
